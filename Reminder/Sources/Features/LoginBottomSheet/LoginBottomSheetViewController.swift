@@ -9,8 +9,9 @@ import Foundation
 import UIKit
 
 class LoginBottomSheetViewController: UIViewController {
-    
+    var mainNavigation: UINavigationController?
     let loginView = LoginBottomSheetView()
+    let viewModel = LoginBottomSheetViewModel()
     var handleAreaHeight: CGFloat = 50.0
     
     override func viewDidLoad() {
@@ -19,6 +20,16 @@ class LoginBottomSheetViewController: UIViewController {
         loginView.delegate = self
         setupUI()
         setupGesture()
+        bindViewModel()
+    }
+    
+    private func bindViewModel() {
+        viewModel.successResult = { [weak self] in
+            let viewController = UIViewController()
+            viewController.view.backgroundColor = .red
+            self?.dismiss(animated: false)
+            self?.mainNavigation?.pushViewController(viewController, animated: true)
+        }
     }
     
     private func setupGesture() {
@@ -65,7 +76,8 @@ class LoginBottomSheetViewController: UIViewController {
 
 extension LoginBottomSheetViewController: LoginBottomSheetViewDelegate {
     func sendLoginData(user: String, password: String) {
-        print(user, password)
+        viewModel.doAuth(usernameLogin: user, password: password)
+        
     }
     
     

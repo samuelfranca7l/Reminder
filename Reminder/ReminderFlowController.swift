@@ -11,6 +11,7 @@ import FirebaseAuth
 class ReminderFlowController {
     //MARK: - Properties
     private var navigationController: UINavigationController?
+    private let viewControllerFactory: ViewControllersFactoryProtocol
 
     private func checkUserAuthentication() {
         if Auth.auth().currentUser != nil {
@@ -20,26 +21,21 @@ class ReminderFlowController {
         } else {
             // Usuário não está autenticado
             print("usuario nao logado")
-            showLoginBottomSheet()
+            openLoginBottomSheet()
         }
     }
-
-    //private let viewControllerFactory
-    
-    
-    
-
     
     
     //MARK: - init
     public init() {
+        self.viewControllerFactory = ViewControllersFactory()
     }
     
     //MARK: - startFlow
     func start() -> UINavigationController? {
-        let startViewController = SplashViewController()
+        let startViewController = viewControllerFactory.makeSplashViewController(flowDelegate: self)
         self.navigationController = UINavigationController(rootViewController: startViewController)
-        //try? Auth.auth().signOut()
+        try? Auth.auth().signOut()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             self.checkUserAuthentication()
         }
@@ -49,6 +45,7 @@ class ReminderFlowController {
 }
 
 //MARK: - Login
+
 extension ReminderFlowController: LoginBottomSheetFlowDelegate {
     func navigateToHome() {
         self.navigationController?.dismiss(animated: true)
@@ -56,14 +53,14 @@ extension ReminderFlowController: LoginBottomSheetFlowDelegate {
         viewController.view.backgroundColor = .red
         self.navigationController?.pushViewController(viewController, animated: true)
     }
-    
+}
 //MARK: - Splash
 
-    func showLoginBottomSheet() {
-        let loginBottomSheet = LoginBottomSheetViewController(flowDelegate: self)
+extension ReminderFlowController: SplashFlowDelegate {
+    func openLoginBottomSheet() {
+        let loginBottomSheet = viewControllerFactory.makeLoginBottomSheetViewController(flowDelegate: self)
         loginBottomSheet.modalPresentationStyle = .overCurrentContext
         loginBottomSheet.modalTransitionStyle = .crossDissolve
         self.navigationController?.present(loginBottomSheet, animated: true)
-        }
-    
+    }
 }

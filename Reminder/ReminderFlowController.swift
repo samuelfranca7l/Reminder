@@ -13,17 +13,17 @@ class ReminderFlowController {
     private var navigationController: UINavigationController?
     private let viewControllerFactory: ViewControllersFactoryProtocol
 
-    private func checkUserAuthentication() {
-        if Auth.auth().currentUser != nil {
-            // Usuário já está autenticado
-            print("usuario logado")
-            navigateToHome()
-        } else {
-            // Usuário não está autenticado
-            print("usuario nao logado")
-            openLoginBottomSheet()
-        }
-    }
+//    private func checkUserAuthentication() {
+//        if Auth.auth().currentUser != nil {
+//            // Usuário já está autenticado
+//            print("usuario logado")
+//            navigateToHome()
+//        } else {
+//            // Usuário não está autenticado
+//            print("usuario nao logado")
+//            openLoginBottomSheet()
+//        }
+//    }
     
     
     //MARK: - init
@@ -35,10 +35,10 @@ class ReminderFlowController {
     func start() -> UINavigationController? {
         let startViewController = viewControllerFactory.makeSplashViewController(flowDelegate: self)
         self.navigationController = UINavigationController(rootViewController: startViewController)
-        try? Auth.auth().signOut()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            self.checkUserAuthentication()
-        }
+//        try? Auth.auth().signOut()
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+//            self.checkUserAuthentication()
+//        }
         return navigationController
     }
 
@@ -49,8 +49,7 @@ class ReminderFlowController {
 extension ReminderFlowController: LoginBottomSheetFlowDelegate {
     func navigateToHome() {
         self.navigationController?.dismiss(animated: true)
-        let viewController = UIViewController()
-        viewController.view.backgroundColor = .red
+        let viewController = viewControllerFactory.makeHomeViewController(flowDelegate: self)
         self.navigationController?.pushViewController(viewController, animated: true)
     }
 }
@@ -64,3 +63,8 @@ extension ReminderFlowController: SplashFlowDelegate {
         self.navigationController?.present(loginBottomSheet, animated: true)
     }
 }
+
+extension ReminderFlowController: HomeFlowDelegate {
+    
+}
+

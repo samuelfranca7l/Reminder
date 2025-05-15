@@ -10,7 +10,8 @@ import UIKit
 final class ViewControllersFactory: ViewControllersFactoryProtocol {
     func makeSplashViewController(flowDelegate: SplashFlowDelegate) -> SplashViewController {
         let contentView = SplashView()
-        let viewController = SplashViewController(contentView: contentView, flowDelegate: flowDelegate)
+        let viewController = SplashViewController(contentView: contentView,
+                                                  flowDelegate: flowDelegate)
         return viewController
     }
     
@@ -21,4 +22,10 @@ final class ViewControllersFactory: ViewControllersFactoryProtocol {
         return viewController
     }
     
+    func makeHomeViewController(flowDelegate: HomeFlowDelegate) -> HomeViewController {
+        let contentView = HomeView()
+        let viewController = HomeViewController(contentView: contentView,
+                                                flowDelegate: flowDelegate)
+        return viewController
+    }
 }

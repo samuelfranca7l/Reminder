@@ -28,7 +28,6 @@ class HomeView: UIView {
     
     let profileImage: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(named: "userLogo")
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         imageView.isUserInteractionEnabled = true
@@ -54,6 +53,20 @@ class HomeView: UIView {
         textField.placeholder = "Insira seu nome"
         textField.translatesAutoresizingMaskIntoConstraints = false
         return textField
+    }()
+    
+    let myPrescriptionsButtons: ButtonHomeView = {
+        let button = ButtonHomeView(icon: UIImage(named: "paper"), title: "Minhas receitas", description: "Acompanhe os medicamentos e gerencia lembretes")
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    let newPrescriptionButton: ButtonHomeView = {
+        let button = ButtonHomeView(icon: UIImage(named: "pills"),
+                                    title: "Nova receita",
+                                    description: "Cadastre novas receitas")
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
     }()
     
     let feedbackButton: UIButton = {
@@ -86,6 +99,8 @@ class HomeView: UIView {
         
         addSubview(contentBrackground)
         contentBrackground.addSubview(feedbackButton)
+        contentBrackground.addSubview(myPrescriptionsButtons)
+        contentBrackground.addSubview(newPrescriptionButton)
         
         setupConstraints()
         setupImageGesture()
@@ -121,7 +136,15 @@ class HomeView: UIView {
             feedbackButton.leadingAnchor.constraint(equalTo: contentBrackground.leadingAnchor, constant: Metrics.medium),
             feedbackButton.trailingAnchor.constraint(equalTo: contentBrackground.trailingAnchor, constant: -Metrics.medium),
             
+            myPrescriptionsButtons.topAnchor.constraint(equalTo: contentBrackground.topAnchor, constant: Metrics.huge),
+            myPrescriptionsButtons.leadingAnchor.constraint(equalTo: contentBrackground.leadingAnchor, constant: Metrics.medium),
+            myPrescriptionsButtons.trailingAnchor.constraint(equalTo: contentBrackground.trailingAnchor, constant: -Metrics.medium),
+            myPrescriptionsButtons.heightAnchor.constraint(equalToConstant: 112),
             
+            newPrescriptionButton.topAnchor.constraint(equalTo: myPrescriptionsButtons.bottomAnchor, constant: Metrics.medium),
+            newPrescriptionButton.leadingAnchor.constraint(equalTo: contentBrackground.leadingAnchor, constant: Metrics.medium),
+            newPrescriptionButton.trailingAnchor.constraint(equalTo: contentBrackground.trailingAnchor, constant: -Metrics.medium),
+            newPrescriptionButton.heightAnchor.constraint(equalToConstant: 112),
         ])
     }
     

@@ -28,6 +28,7 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         setupNavigationBar()
         setup()
+        setupActionForNewReceipe()
         checkForExistingData()
     }
     
@@ -49,6 +50,13 @@ class HomeViewController: UIViewController {
         buildHierarchy()
     }
     
+    private func  setupActionForNewReceipe() {
+        contentView.newPrescriptionButton.tapAction = { [weak self] in
+            self?.didTapNewPrescriptionButton()
+            
+        }
+    }
+    
     private func buildHierarchy() {
         setupContentViewToBounds(contentView: contentView)
     }
@@ -63,6 +71,9 @@ class HomeViewController: UIViewController {
         if UserDefaultsManager.loadUser() != nil {
             contentView.nameTextField.text = UserDefaultsManager.loadUserName()
         }
+        if UserDefaultsManager.loadProfileImage() != nil {
+            contentView.profileImage.image = UserDefaultsManager.loadProfileImage()
+        }
     }
     
 }
@@ -70,6 +81,10 @@ class HomeViewController: UIViewController {
 extension HomeViewController: HomeViewDelegate {
     func didTapProfileImage() {
         selectProfileImage()
+    }
+    
+    func didTapNewPrescriptionButton() {
+        flowDelegate.navigateToRecipes()
     }
 
 }
@@ -86,8 +101,11 @@ extension HomeViewController: UIImagePickerControllerDelegate, UINavigationContr
     internal func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         if let editedImage = info[.editedImage] as? UIImage {
             contentView.profileImage.image = editedImage
+            UserDefaultsManager.saveProfileImage(image: editedImage)
         } else if let originalImage = info[.originalImage] as? UIImage {
             contentView.profileImage.image = originalImage
+            UserDefaultsManager.saveProfileImage(image: originalImage)
+
         }
         dismiss(animated: true)
     }

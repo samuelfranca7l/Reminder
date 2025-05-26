@@ -8,6 +8,11 @@
 import UIKit
 
 final class ViewControllersFactory: ViewControllersFactoryProtocol {
+    func makeNewReceipesViewController() -> NewReceiptViewController {
+        let viewController = NewReceiptViewController()
+        return viewController
+    }
+    
     func makeSplashViewController(flowDelegate: SplashFlowDelegate) -> SplashViewController {
         let contentView = SplashView()
         let viewController = SplashViewController(contentView: contentView,

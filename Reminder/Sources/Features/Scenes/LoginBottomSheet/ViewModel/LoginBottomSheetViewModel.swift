@@ -12,7 +12,7 @@ class LoginBottomSheetViewModel {
     
     func doAuth(usernameLogin: String, password: String) {
         Auth.auth().signIn(withEmail: usernameLogin, password: password) { [weak self] authResult, error in
-            if let error = error {
+            if error != nil {
                 self?.errorResult?("Erro ao realizar login, verifique as credenciais digitadas")
             } else {
                 self?.successResult?(usernameLogin)

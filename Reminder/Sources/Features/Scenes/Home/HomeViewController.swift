@@ -8,15 +8,15 @@
 import UIKit
 
 class HomeViewController: UIViewController {
-    let viewModel = HomeViewModel()
+    let viewModel: HomeViewModel
     let contentView: HomeView
-    var handleAreaHeight: CGFloat = 50.0
-    public weak var flowDelegate: HomeFlowDelegate?
+    let flowDelegate: HomeFlowDelegate
     
     init(contentView: HomeView,
          flowDelegate: HomeFlowDelegate) {
         self.contentView = contentView
         self.flowDelegate = flowDelegate
+        self.viewModel = HomeViewModel()
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -28,6 +28,7 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         setupNavigationBar()
         setup()
+        checkForExistingData()
     }
     
     private func setupNavigationBar() {
@@ -43,6 +44,8 @@ class HomeViewController: UIViewController {
     
     private func setup() {
         view.addSubview(contentView)
+        view.backgroundColor = Colors.gray600
+        contentView.delegate = self
         buildHierarchy()
     }
     
@@ -52,6 +55,43 @@ class HomeViewController: UIViewController {
     
     @objc
     private func logoutAction(){
+        UserDefaultsManager.removeUser()
+        self.flowDelegate.logout()
+    }
+    
+    private func checkForExistingData() {
+        if UserDefaultsManager.loadUser() != nil {
+            contentView.nameTextField.text = UserDefaultsManager.loadUserName()
+        }
+    }
+    
+}
+
+extension HomeViewController: HomeViewDelegate {
+    func didTapProfileImage() {
+        selectProfileImage()
+    }
+
+}
+
+extension HomeViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+    private func selectProfileImage() {
+        let imagePicker = UIImagePickerController()
+        imagePicker.delegate = self
+        imagePicker.sourceType = .photoLibrary
+        imagePicker.allowsEditing = true
+        present(imagePicker,animated: true)
         
+    }
+    internal func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let editedImage = info[.editedImage] as? UIImage {
+            contentView.profileImage.image = editedImage
+        } else if let originalImage = info[.originalImage] as? UIImage {
+            contentView.profileImage.image = originalImage
+        }
+        dismiss(animated: true)
+    }
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true)
     }
 }

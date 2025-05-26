@@ -40,6 +40,7 @@ class LoginBottomSheetView: UIView {
     
     private let emailTextField: UITextField = {
         let text =  UITextField()
+        text.autocapitalizationType = .none
         text.placeholder = "login.email.placeholder".localized
         text.borderStyle = .roundedRect
         text.translatesAutoresizingMaskIntoConstraints = false

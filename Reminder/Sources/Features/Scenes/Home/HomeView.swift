@@ -8,7 +8,7 @@
 import UIKit
 
 class HomeView: UIView {
-    public weak var flowDelegate: HomeViewDelegate?
+    public weak var delegate: HomeViewDelegate?
     
     let profileBackground: UIView = {
         let view = UIView()
@@ -28,9 +28,11 @@ class HomeView: UIView {
     
     let profileImage: UIImageView = {
         let imageView = UIImageView()
+        imageView.image = UIImage(named: "userLogo")
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = Metrics.huge
+        imageView.isUserInteractionEnabled = true
+        imageView.layer.cornerRadius = Metrics.medium
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -44,12 +46,14 @@ class HomeView: UIView {
         return label
     }()
     
-    let nameLabel: UILabel = {
-        let label = UILabel()
-        label.textColor = Colors.gray100
-        label.font = Typography.heading
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
+    let nameTextField: UITextField = {
+        let textField = UITextField()
+        textField.textColor = Colors.gray100
+        textField.font = Typography.heading
+        textField.returnKeyType = .done
+        textField.placeholder = "Insira seu nome"
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
     }()
     
     let feedbackButton: UIButton = {
@@ -66,6 +70,7 @@ class HomeView: UIView {
         super.init(frame: frame)
         
         setupView()
+        setupTextField()
     }
     
     required init?(coder: NSCoder) {
@@ -77,12 +82,13 @@ class HomeView: UIView {
         addSubview(profileBackground)
         profileBackground.addSubview(profileImage)
         profileBackground.addSubview(welcomeLabel)
-        profileBackground.addSubview(nameLabel)
+        profileBackground.addSubview(nameTextField)
         
         addSubview(contentBrackground)
         contentBrackground.addSubview(feedbackButton)
         
         setupConstraints()
+        setupImageGesture()
     }
     
     
@@ -93,18 +99,18 @@ class HomeView: UIView {
             profileBackground.trailingAnchor.constraint(equalTo: trailingAnchor),
             profileBackground.topAnchor.constraint(equalTo: topAnchor),
             profileBackground.heightAnchor.constraint(equalToConstant: Metrics.backgroundProfileSize),
-
+            
             profileImage.topAnchor.constraint(equalTo: profileBackground.topAnchor, constant: Metrics.huge),
             profileImage.leadingAnchor.constraint(equalTo: profileBackground.leadingAnchor, constant: Metrics.medium),
             profileImage.heightAnchor.constraint(equalToConstant: Metrics.profileImageSize),
             profileImage.widthAnchor.constraint(equalToConstant: Metrics.profileImageSize),
             
-            welcomeLabel.topAnchor.constraint(equalTo: profileImage.bottomAnchor, constant: Metrics.huge),
-            welcomeLabel.leadingAnchor.constraint(equalTo: profileBackground.leadingAnchor, constant: Metrics.medium),
+            welcomeLabel.topAnchor.constraint(equalTo: profileImage.bottomAnchor, constant: Metrics.small),
+            welcomeLabel.leadingAnchor.constraint(equalTo: profileImage.leadingAnchor),
             
-            nameLabel.topAnchor.constraint(equalTo: welcomeLabel.bottomAnchor),
-            nameLabel.leadingAnchor.constraint(equalTo: profileBackground.leadingAnchor, constant: Metrics.medium),
-
+            nameTextField.topAnchor.constraint(equalTo: welcomeLabel.bottomAnchor),
+            nameTextField.leadingAnchor.constraint(equalTo: profileImage.leadingAnchor),
+            
             contentBrackground.leadingAnchor.constraint(equalTo: leadingAnchor),
             contentBrackground.trailingAnchor.constraint(equalTo: trailingAnchor),
             contentBrackground.topAnchor.constraint(equalTo: profileBackground.bottomAnchor, constant: -Metrics.medium),
@@ -114,11 +120,42 @@ class HomeView: UIView {
             feedbackButton.bottomAnchor.constraint(equalTo: contentBrackground.bottomAnchor, constant: -Metrics.huge),
             feedbackButton.leadingAnchor.constraint(equalTo: contentBrackground.leadingAnchor, constant: Metrics.medium),
             feedbackButton.trailingAnchor.constraint(equalTo: contentBrackground.trailingAnchor, constant: -Metrics.medium),
-
-
+            
+            
         ])
+    }
+    
+    private func setupTextField() {
+        nameTextField.addTarget(self,
+                                action: #selector(nameTextFieldDidEndEditing),
+                                for: .editingDidEnd)
+        nameTextField.delegate = self
+    }
+    
+    private func setupImageGesture() {
+        let tapGestureRecognizer = UITapGestureRecognizer(target: self,
+                                                          action: #selector(profileImageTapped))
+        profileImage.addGestureRecognizer(tapGestureRecognizer)
+        
+    }
+    
+    @objc
+    private func profileImageTapped() {
+        delegate?.didTapProfileImage()
+    }
+    
+    @objc
+    private func nameTextFieldDidEndEditing() {
+        let userName = nameTextField.text ?? ""
+        UserDefaultsManager.saveUserName(name: userName)
+    }
+}
 
-        
-        
+extension HomeView: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        let userName = nameTextField.text ?? ""
+        UserDefaultsManager.saveUserName(name: userName)
+        return true
     }
 }

@@ -35,10 +35,7 @@ class ReminderFlowController {
     func start() -> UINavigationController? {
         let startViewController = viewControllerFactory.makeSplashViewController(flowDelegate: self)
         self.navigationController = UINavigationController(rootViewController: startViewController)
-//        try? Auth.auth().signOut()
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-//            self.checkUserAuthentication()
-//        }
+
         return navigationController
     }
 
@@ -65,8 +62,13 @@ extension ReminderFlowController: SplashFlowDelegate {
 }
 
 extension ReminderFlowController: HomeFlowDelegate {
-    func navigateToRecipes() {
-        let receipesViewController = viewControllerFactory.makeNewReceipesViewController()
+    func navigateToRecipesList() {
+        let myReceiptsViewController = viewControllerFactory.makeMyReceiptsViewController(flowDelegate: self)
+        self.navigationController?.pushViewController(myReceiptsViewController, animated: true)
+    }
+    
+    func navigateToNewRecipes() {
+        let receipesViewController = viewControllerFactory.makeNewReceipesViewController(flowDelegate: self)
         self.navigationController?.pushViewController(receipesViewController, animated: true)
         self.navigationController?.navigationBar.isHidden = true
     }
@@ -75,7 +77,19 @@ extension ReminderFlowController: HomeFlowDelegate {
         self.navigationController?.popViewController(animated: true)
         self.openLoginBottomSheet()
     }
-    
-    
 }
 
+extension ReminderFlowController: MyReceiptsFlowDelegate {
+    func didTapBackButton() {
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    func goToNewReceipts() {
+        let receipesViewController = viewControllerFactory.makeNewReceipesViewController(flowDelegate: self)
+        self.navigationController?.pushViewController(receipesViewController, animated: true)
+    }
+}
+
+extension ReminderFlowController: NewReceiptFlowDelegate {
+    
+}

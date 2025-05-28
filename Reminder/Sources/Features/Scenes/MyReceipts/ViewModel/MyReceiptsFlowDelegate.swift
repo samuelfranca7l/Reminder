@@ -7,5 +7,12 @@
 
 protocol MyReceiptsFlowDelegate: AnyObject {
     func didTapBackButton()
-    func didTapAddButton()
+    func goToNewReceipts()
 }
+
+
+/*
+ passo 1 - criar o protocolo
+ passo 2 - implementar o delegate no coordinator
+ passo 3 - 
+ */

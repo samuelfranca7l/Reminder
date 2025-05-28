@@ -8,8 +8,18 @@
 import UIKit
 
 final class ViewControllersFactory: ViewControllersFactoryProtocol {
-    func makeNewReceipesViewController() -> NewReceiptViewController {
-        let viewController = NewReceiptViewController()
+    
+    func makeMyReceiptsViewController(flowDelegate: MyReceiptsFlowDelegate) -> MyReceiptsViewController {
+        let contentView = MyReceiptsView()
+        let viewController = MyReceiptsViewController(contentView: contentView,
+                                                      flowDelegate: flowDelegate)
+        return viewController
+    }
+    
+    func makeNewReceipesViewController(flowDelegate: NewReceiptFlowDelegate) -> NewReceiptViewController {
+        let contentView = NewReceiptView()
+        let viewController = NewReceiptViewController(contentView: contentView,
+                                                      flowDelegate: flowDelegate)
         return viewController
     }
     

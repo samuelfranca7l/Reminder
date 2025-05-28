@@ -5,6 +5,7 @@ target 'Reminder' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
   pod 'Firebase/Auth'
+  pod 'SQLite.swift' 
   # Pods for Reminder
 
   target 'ReminderTests' do

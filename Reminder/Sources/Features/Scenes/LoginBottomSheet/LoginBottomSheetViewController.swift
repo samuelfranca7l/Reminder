@@ -34,10 +34,22 @@ class LoginBottomSheetViewController: UIViewController {
         bindViewModel()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
     private func bindViewModel() {
         viewModel.successResult = { [weak self] usernameLogin in
             self?.presentSaveLoginAlert(email: usernameLogin)
-//            self?.flowDelegate?.navigateToHome()
+            //            self?.flowDelegate?.navigateToHome()
         }
         
         viewModel.errorResult = { [weak self] errorMessage in
@@ -61,7 +73,7 @@ class LoginBottomSheetViewController: UIViewController {
                                                 message: "Deseja salvar seu acesso?",
                                                 preferredStyle: .alert)
         let saveAction = UIAlertAction(title: "Salvar",
-                                       style: .default) {_ in 
+                                       style: .default) {_ in
             let user = User(email: email, isUserSaved: true)
             UserDefaultsManager.saveUser(user: user)
             self.flowDelegate?.navigateToHome()
@@ -97,13 +109,33 @@ class LoginBottomSheetViewController: UIViewController {
             contentView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
             contentView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
             contentView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
-
+            
         ])
         
         contentView.heightAnchor.constraint(equalTo: self.view.heightAnchor, multiplier: 0.5).isActive = true
         
     }
     
+    @objc
+    private func keyboardWillShow(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else {
+            return
+        }
+        
+        let keyboardHeight = keyboardFrame.height
+        
+        UIView.animate(withDuration: 0.3) {
+            self.view.frame.origin.y = -keyboardHeight / 1.7
+        }
+    }
+    
+    @objc
+    private func keyboardWillHide(notification: Notification) {
+        UIView.animate(withDuration: 0.3) {
+            self.view.frame.origin.y = 0
+        }
+    }
 }
 
 

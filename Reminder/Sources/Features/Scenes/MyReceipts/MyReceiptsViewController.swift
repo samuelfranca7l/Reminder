@@ -10,15 +10,9 @@ import UIKit
 class MyReceiptsViewController: UIViewController {
     let contentView: MyReceiptsView
     weak var flowDelegate: MyReceiptsFlowDelegate?
+    let viewModel = MyReceiptsViewModel()
     
-    private let mockMedicamentos = [
-        ("Buscopam", "13:00", "2 em 2 horas"),
-        ("Buscopam", "13:00", "4 em 4 horas"),
-        ("aspirina", "13:00", "2 em 2 horas"),
-        ("Buscopam", "13:00", "8 em 8 horas"),
-        ("Buscopam", "15:00", "2 em 2 horas"),
-        ("dipirona", "13:00", "2 em 2 horas"),
-    ]
+    private var medicines: [Medicine] = []
     
     init(contentView: MyReceiptsView,
          flowDelegate: MyReceiptsFlowDelegate) {
@@ -34,7 +28,7 @@ class MyReceiptsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavigationBar()
-        
+        loadData()
         contentView.delegate = flowDelegate
         setup()
         setupTableView()
@@ -69,12 +63,16 @@ class MyReceiptsViewController: UIViewController {
         contentView.tableView.register(RemedyCell.self, forCellReuseIdentifier: RemedyCell.identifier)
         contentView.tableView.contentInset = UIEdgeInsets(top: 16, left: 0, bottom: 16, right: 0)
     }
+    
+    private func loadData() {
+        medicines = viewModel.fetchData()
+    }
 }
 
 
 extension MyReceiptsViewController: UITableViewDelegate {
     func numberOfSections(in tableView: UITableView) -> Int {
-        return mockMedicamentos.count
+        return medicines.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -99,10 +97,22 @@ extension MyReceiptsViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: RemedyCell.identifier, for: indexPath) as! RemedyCell
-        let medicamento = mockMedicamentos[indexPath.section]
-        cell.configure(title: medicamento.0, time: medicamento.1, recurrence: medicamento.2)
+        let medicinesVar = medicines[indexPath.section]
+        cell.configure(title: medicinesVar.remedy, time: medicinesVar.time, recurrence: medicinesVar.recurrence)
+        
+        cell.onDelete = { [weak self] in
+            guard let self = self else { return }
+            if let actualIndexPath = tableView.indexPath(for: cell) {
+                if actualIndexPath.section < self.medicines.count {
+                    self.viewModel.deleteReceipt(byId: self.medicines[actualIndexPath.section].id)
+                    self.medicines.remove(at: actualIndexPath.section)
+                    
+                    tableView.deleteSections(IndexSet(integer: actualIndexPath.section), with: .automatic)
+                }
+            } else {
+                print("Erro ao excluir uma secao invalida")
+            }
+        }
         return cell
     }
-    
-    
 }
